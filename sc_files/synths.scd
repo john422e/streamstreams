@@ -38,6 +38,13 @@ var dataDir = cwd ++ "../"; // update this for perf bundle
 
 
 // SYNTH DEFS
+SynthDef.new(\mic2out, {
+	arg in=0, out1=0, out2=1, amp=1;
+	var sig;
+	sig = SoundIn.ar(in, amp);
+	Out.ar([out1, out2], sig);
+}).add;
+
 SynthDef.new(\bufPlay, {
 	arg buf=0, rate=1, trigRate=1, iphase=0, width=0.5, t_trig, startPos=0, loop=0, da=2, amp=0.5, pan=0, out=0;
 	var trig, env, sig, pulseEnv, time=0.05;
@@ -142,7 +149,7 @@ SynthDef.new(\sinBank512, {
 	pulseEnv = EnvGen.kr( Env.asr(time, 1, time), gate: trig);
 	// apply pulse
 	// signal
-	sig = DynKlang.ar( `[ \freqs.kr(freqs), \amps.kr(amps*2)] );
+	sig = DynKlang.ar( `[ \freqs.kr(freqs), \amps.kr(amps*2)] ); // amps multiplier????
 	// select with or without amp pulse
 	sig = Select.ar(pulse, [ sig, sig * pulseEnv ]);
 	// EQ
@@ -150,7 +157,7 @@ SynthDef.new(\sinBank512, {
 	sig = BHiShelf.ar(sig, 200, rs: 0.5, db: -2);
 	sig = BHiShelf.ar(sig, 300, rs: 0.1, db: -2);
 	sig = BHiShelf.ar(sig, 400, rs: 0.1, db: -1);
-	sig = BHiShelf.ar(sig, 600, rs: 0.2, db: -3);
+	//sig = BHiShelf.ar(sig, 600, rs: 0.2, db: -3);
 
 	sig = Pan2.ar(sig, \pan.kr(0), \amp.kr(0.1)) * env;
 	Out.ar(\out.kr(0), sig);
@@ -233,7 +240,7 @@ SynthDef.new(\sinBank512, {
 		\pan, pan,
 		\iphase, iphase,
 		\width, width,
-		\amp, 0.9
+		\amp, 0.6 // UPDATE THIS LINE FOR BALANCING
 	]);
 });
 

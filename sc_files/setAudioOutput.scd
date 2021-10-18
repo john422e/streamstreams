@@ -6,6 +6,7 @@ var inLabel, outLabel, inMenu, outMenu; // command-enter here to open menu for i
 o = Server.default.options;
 o.numWireBufs_(1024);
 o.sampleRate_(48000);
+o.numOutputBusChannels = 8;
 s.boot;
 s.quit;
 o = Server.default.options;

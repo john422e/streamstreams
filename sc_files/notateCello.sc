@@ -1,3 +1,43 @@
+// adjust buff gain - 168, 169
+// sinBank512 - 156
+
+(
+s = Server.local;
+o = Server.default.options;
+o.numOutputBusChannels = 8;
+s.options.sampleRate_(48000);
+s.options.memSize_(2.pow(20)); // roughly a gig of memory
+// cleanup
+s.newBusAllocators;
+ServerBoot.removeAll;
+ServerTree.removeAll;
+ServerQuit.removeAll;
+
+s.options.inDevice_(
+	//"BlackHole 16ch"
+	//"MacBook Pro Microphone"
+	"Scarlett 18i20 USB"
+);
+
+s.options.outDevice_(
+	//"BlackHole 16ch"
+	//"External Headphones"
+	//"MacBook Pro Speakers"
+	"Scarlett 18i20 USB"
+);
+
+s.reboot;
+)
+
+ServerOptions.devices;
+
+(
+// run this for live mic on cello
+~dpa = Synth.new(\mic2out, [\in, 0, \out1, 2, \out2, 7]);
+)
+~dpa.set(\out1, 2, \out, 7);
+
+
 (
 // MUST LOAD functions.scd and synths.scd FIRST
 // display vars
@@ -21,9 +61,10 @@ var allPairs = [depth1pairs, depth2pairs, depth3pairs];
 var currentDepth, currentPair, location1, location2, compList, currentComp, location1peaks, location2peaks, compPeakList, currentFileName, freqs;
 // audio stuff
 var panPositions, synth1pan, synth2pan, depthAmp;
-var stereo=false, buffOut = 2;
-stereo = true; // for testing in stereo, set to false for quad
-if( stereo, { buffOut = 0 }, { buffOut = 2 });
+var stereo=false, buffOut = [3, 5];
+//stereo = true;
+//stereo = false; // for testing in stereo, set to false for quad
+if( stereo, { buffOut = [0, 1] }, { buffOut = [3, 5] });
 
 // BUILD WINDOW -----------------------------------------------------------------------------------
 //Window.closeAll;
@@ -120,7 +161,7 @@ frets = [1, 3/2, 2/1];
 	switch ( currentDepth,
 		1, { depthAmp = 1.0 },
 		2, { depthAmp = 0.9 },
-		3, { depthAmp = 6.0 }
+		3, { depthAmp = 7.0 }
 	);
 };
 // first time
@@ -132,8 +173,8 @@ frets = [1, 3/2, 2/1];
 ~synths[currentDepth-1][0].set(\freqs, location1peaks[0], \amps, location1peaks[1], \pan, synth1pan, \amp, depthAmp, \gate, 1);
 ~synths[currentDepth-1][1].set(\freqs, compPeakList[currentComp][0], \amps, compPeakList[currentComp][1], \pan, synth2pan, \pulse, 1, \amp, depthAmp, \gate, 1); // "LEFT" control cycles through these
 // set
-~synths[3][0].set(\buf, location1-1, \pan, synth1pan, \out, buffOut, \amp, 0.9, \gate, 1);
-~synths[3][1].set(\buf, currentComp-1, \pan, synth2pan, \out, buffOut, \amp, 0.9, \gate, 1); // chan setup? does it need to be reversed?
+~synths[3][0].set(\buf, location1-1, \pan, synth1pan, \out, buffOut[0], \amp, 0.5, \gate, 1);
+~synths[3][1].set(\buf, currentComp-1, \pan, synth2pan, \out, buffOut[1], \amp, 0.5, \gate, 1); // chan setup? does it need to be reversed?
 
 
 // add drawing function for view
