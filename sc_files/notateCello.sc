@@ -1,6 +1,8 @@
 // adjust buff gain - 168, 169
 // sinBank512 - 156
 
+// first load functions (functions.scd)
+// do this second (boot server)
 (
 s = Server.local;
 o = Server.default.options;
@@ -18,7 +20,6 @@ s.options.inDevice_(
 	//"MacBook Pro Microphone"
 	"Scarlett 18i20 USB"
 );
-
 s.options.outDevice_(
 	//"BlackHole 16ch"
 	//"External Headphones"
@@ -28,18 +29,26 @@ s.options.outDevice_(
 
 s.reboot;
 )
+// then load buffers and synthdefs (synths.scd)
 
 ServerOptions.devices;
 
+
+// then start mic
 (
+~micChan = 5; // set this from interface chan
 // run this for live mic on cello
-~dpa = Synth.new(\mic2out, [\in, 0, \out1, 2, \out2, 7]);
+~dpa = Synth.new(\mic2out, [\in, ~micChan, \out1, 2, \out2, 7]);
 )
-~dpa.set(\out1, 2, \out, 7);
+s.meter;
 
 
+// then this to start! (mute speakers at board)
 (
 // MUST LOAD functions.scd and synths.scd FIRST
+// RECORDING VARS -- UPDATE FOR EACH RECORDING
+var logCount = 4, fileLog; // 4 = concert 10.21.21
+
 // display vars
 var title = "streams, summed (stream)";
 var mainWindow, wWidth=800, wHeight=920, vWidth=(wWidth-200), dView;
@@ -66,6 +75,13 @@ var stereo=false, buffOut = [3, 5];
 //stereo = false; // for testing in stereo, set to false for quad
 if( stereo, { buffOut = [0, 1] }, { buffOut = [3, 5] });
 
+// START RECORDING
+// START RECORDING RIGHT AWAY
+r = Recorder(s);
+r.recHeaderFormat_('wav');
+f = cwd ++ "../recOutput/" ++ Date.getDate.stamp ++ ".wav".postln;
+r.record(f, numChannels:8);
+
 // BUILD WINDOW -----------------------------------------------------------------------------------
 //Window.closeAll;
 mainWindow = Window(title, Rect(0, 200, wWidth, wHeight), resizable: false, scroll: true)
@@ -81,6 +97,9 @@ mainWindow.onClose_( {
 			synth.set(\gate, 0);
 		});
 	});
+	r.stopRecording;
+	s.quit;
+	//~closeFile.("../performanceLogs/log" ++ logCount.asString ++ ".txt");
 });
 	//r.stopRecording;
 	//bufPlayers.do( { arg buf; buf.free });
@@ -163,7 +182,13 @@ frets = [1, 3/2, 2/1];
 		2, { depthAmp = 0.9 },
 		3, { depthAmp = 7.0 }
 	);
+	// update file
+	fileLog = currentFileName ++ ", DEPTH: " ++ currentDepth.asString ++ " " ++ compList.asString;
+	//~updateFile.("../performanceLogs/log.txt", "RANDOM STUFF");
+	~updateFile.("log" ++ logCount.asString ++ ".txt", fileLog);
+	//"SOMETHING ELSE".postln;
 };
+
 // first time
 ~setNew.value;
 // location1peaks are stored and can be sent to synth
@@ -296,7 +321,11 @@ mainWindow.view.keyDownAction = {
 	});
 };
 
+
+
 )
+
+
 ~synths[2][1].set(\gate, 1, \amp, 6);
 
 a = [1, 2, 3];

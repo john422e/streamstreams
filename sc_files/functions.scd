@@ -136,6 +136,26 @@
 	fn;
 };
 
+~updateFile = {
+	arg fn, newLine; // fn is extension only (will add to current folder)
+	// opens an existing file (or creates a new one if not) and appends a new line
+	var file, path;
+	//path = PathName.new(thisProcess.nowExecutingPath).parentPath ++ fn;
+	path = "/Users/johneagle/projects/music/COMP/still_life/new_architecture/fall_creek_gorge_inlet/performance/performanceLogs/" ++ fn;
+	//path = PathName.new(path);
+	//[path, newLine].postln;
+	file = File(path, "a"); // append mode
+	file.write(thisThread.seconds.asString ++ " " ++ newLine ++ "\n");
+	file.close;
+};
+
+~closeFile = {
+	arg fn;
+	var file, path;
+	path = PathName.new(thisProcess.nowExecutingPath).parentPath ++ fn;
+	file = File(path).close;
+};
+
 ~getChordsFromFile = {
 	/*
 	accepts an array of two integers and a depth argument (1, 2, or 3) to get the appropriate .csv file with freqs for cello chords
