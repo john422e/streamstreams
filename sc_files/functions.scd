@@ -141,11 +141,12 @@
 	// opens an existing file (or creates a new one if not) and appends a new line
 	var file, path;
 	//path = PathName.new(thisProcess.nowExecutingPath).parentPath ++ fn;
+	// FIX THIS!!!!---------------------------------------------------------------------------------------------------------------------------------
 	path = "/Users/johneagle/projects/music/COMP/still_life/new_architecture/fall_creek_gorge_inlet/performance/performanceLogs/" ++ fn;
 	//path = PathName.new(path);
 	//[path, newLine].postln;
 	file = File(path, "a"); // append mode
-	file.write(thisThread.seconds.asString ++ " " ++ newLine ++ "\n");
+	file.write(Date.getDate.asString ++ " " ++ newLine ++ "\n"); //thisThread.seconds.asString
 	file.close;
 };
 

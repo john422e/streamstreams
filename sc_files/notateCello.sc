@@ -6,6 +6,7 @@
 (
 s = Server.local;
 o = Server.default.options;
+o.numInputBusChannels = 8;
 o.numOutputBusChannels = 8;
 s.options.sampleRate_(48000);
 s.options.memSize_(2.pow(20)); // roughly a gig of memory
@@ -14,9 +15,10 @@ s.newBusAllocators;
 ServerBoot.removeAll;
 ServerTree.removeAll;
 ServerQuit.removeAll;
-
+// set devices
 s.options.inDevice_(
 	//"BlackHole 16ch"
+	//"Soundflower (64ch)"
 	//"MacBook Pro Microphone"
 	"Scarlett 18i20 USB"
 );
@@ -26,13 +28,16 @@ s.options.outDevice_(
 	//"MacBook Pro Speakers"
 	"Scarlett 18i20 USB"
 );
-
 s.reboot;
 )
 // then load buffers and synthdefs (synths.scd)
 
 ServerOptions.devices;
 
+(
+f = PathName.new(thisProcess.nowExecutingPath).parentPath ++ "functions.scd";
+File.exists(f);
+)
 
 // then start mic
 (
